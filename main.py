@@ -18,7 +18,7 @@ def home():
 async def upload_form(request: Request):
     return templates.TemplateResponse("upload.html", {"request": request})
 
-# ✅ Formdan gelen Excel dosyasını işleyen kısım
+# ✅ Excel dosyasını işleme kısmı
 @app.post("/upload")
 async def upload_file(file: UploadFile, email: str = Form(...)):
     content = await file.read()
