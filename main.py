@@ -27,4 +27,12 @@ async def upload_file(file: UploadFile, email: str = Form(...)):
         smtp.login(os.getenv("EMAIL_ADDRESS"), os.getenv("EMAIL_PASSWORD"))
         smtp.send_message(msg)
 
-    return {"status": "ok", "detail": "E-mail gönderildi"}
+    return {"status": "ok", "detail": "E-mail gönderildi"}from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/upload", response_class=HTMLResponse)
+async def upload_form(request: Request):
+    return templates.TemplateResponse("upload.html", {"request": request})
