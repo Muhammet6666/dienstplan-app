@@ -1,15 +1,24 @@
-from fastapi import FastAPI, UploadFile, Form
+from fastapi import FastAPI, UploadFile, Form, Request
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
 from parser import parse_excel_to_csv
 import smtplib
 from email.message import EmailMessage
 import os
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 def home():
     return {"message": "Dienstplan App çalışıyor!"}
 
+# ✅ HTML form sayfası
+@app.get("/upload", response_class=HTMLResponse)
+async def upload_form(request: Request):
+    return templates.TemplateResponse("upload.html", {"request": request})
+
+# ✅ Formdan gelen Excel dosyasını işleyen kısım
 @app.post("/upload")
 async def upload_file(file: UploadFile, email: str = Form(...)):
     content = await file.read()
@@ -27,12 +36,4 @@ async def upload_file(file: UploadFile, email: str = Form(...)):
         smtp.login(os.getenv("EMAIL_ADDRESS"), os.getenv("EMAIL_PASSWORD"))
         smtp.send_message(msg)
 
-    return {"status": "ok", "detail": "E-mail gönderildi"}from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi import Request
-
-templates = Jinja2Templates(directory="templates")
-
-@app.get("/upload", response_class=HTMLResponse)
-async def upload_form(request: Request):
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return {"status": "ok", "detail": "E-mail gönderildi"}
